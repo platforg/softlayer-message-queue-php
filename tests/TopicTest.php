@@ -1,31 +1,21 @@
 <?php
 
 require_once 'bootstrap.php';
-require_once 'mock.php';
 
-class TopicTest extends PHPUnit_Framework_TestCase
+class TopicTest extends BaseTest
 {
     public function testTopicsList()
     {
-        $messaging = new SoftLayer_Messaging();
+        $topicName = self::topicName();
 
-        if(USE_MOCK) {
-            $messaging->getClient()->setAdapter(new SoftLayer_Http_Adapter_Mock());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::authenticate());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::objectCreated());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::topics());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::objectDeleted());
-        }
+        self::$messaging->topic($topicName)->create();
 
-        $topicName = 'testTopic01';
+        sleep(WAIT);
 
-        $messaging->authenticate(QUEUE_ACCOUNT, QUEUE_USERNAME, QUEUE_API_KEY);
-        $messaging->topic($topicName)->create();
+        $topics = self::$messaging->topics();
 
-        $topics = $messaging->topics();
-
-        $request = $messaging->getClient()->getRequest();
-        $response = $messaging->getClient()->getResponse();
+        $request = self::$messaging->getClient()->getRequest();
+        $response = self::$messaging->getClient()->getResponse();
 
         $this->assertEquals('GET', $request->getMethod());
         $this->assertEquals('/topics', $request->getPath());
@@ -38,41 +28,16 @@ class TopicTest extends PHPUnit_Framework_TestCase
         // basic structure.
         $this->assertGreaterThanOrEqual(0, $response->getBody()->item_count);
         $this->assertCount($response->getBody()->item_count, $response->getBody()->items);
-
-        $messaging->topic($topicName)->delete();
-    }
-
-    public function testTopicSerialization()
-    {
-        $topic = new SoftLayer_Messaging_Topic();
-        $topic->setName('topic');
-        $topic->addTag('tag1');
-        $topic->addTag('tag2');
-
-        $this->assertEquals(json_decode(Mock::serializedTopic()), $topic->serialize());
     }
 
     public function testCreateQueueAndHttpEndpointSubscriptions()
     {
-        $messaging = new SoftLayer_Messaging();
+        $topicName = self::topicName();
+        $queueName = self::queueName();
 
-        if(USE_MOCK) {
-            $messaging->getClient()->setAdapter(new SoftLayer_Http_Adapter_Mock());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::authenticate());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::objectCreated());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::objectCreated());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::objectCreated());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::objectCreated());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::subscriptions());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::objectDeleted());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::objectDeleted());
-        }
+        self::$messaging->topic($topicName)->create();
 
-        $topicName = 'testSubscriptionCreation01';
-        $queueName = 'testQueueForSubscription';
-
-        $messaging->authenticate(QUEUE_ACCOUNT, QUEUE_USERNAME, QUEUE_API_KEY);
-        $messaging->topic($topicName)->create();
+        sleep(WAIT);
 
         // Create an HTTP endpoint
         $http_endpoint = new SoftLayer_Messaging_Endpoint_Http();
@@ -82,38 +47,35 @@ class TopicTest extends PHPUnit_Framework_TestCase
         $http_endpoint->setHeaders(array('header1' => 'value1'));
         $http_endpoint->setBody("Example Body");
 
-        $messaging->topic($topicName)->subscription()
+        self::$messaging->topic($topicName)->subscription()
             ->setEndpointType('http')
             ->setEndpoint($http_endpoint)
             ->create();
 
-        $request = $messaging->getClient()->getRequest();
-        $response = $messaging->getClient()->getResponse();
+        $request = self::$messaging->getClient()->getRequest();
+        $response = self::$messaging->getClient()->getResponse();
 
         $this->assertEquals('POST', $request->getMethod());
         $this->assertEquals("/topics/{$topicName}/subscriptions", $request->getPath());
 
         // First, we need a queue
-        $messaging->queue($queueName)->create();
+        self::$messaging->queue($queueName)->create();
+
+        sleep(WAIT);
 
         // Create a Queue endpoint
         $queue_endpoint = new SoftLayer_Messaging_Endpoint_Queue();
         $queue_endpoint->setQueueName($queueName);
 
-        $messaging->topic($topicName)->subscription()
+        self::$messaging->topic($topicName)->subscription()
             ->setEndpointType('queue')
             ->setEndpoint($queue_endpoint)
             ->create();
+    
+        sleep(WAIT);
 
-        if(USE_MOCK == false) {
-            sleep(2);
-        }
-
-        $subscriptions = $messaging->topic($topicName)->subscriptions();
+        $subscriptions = self::$messaging->topic($topicName)->subscriptions();
 
         $this->assertGreaterThanOrEqual(2, count($subscriptions));
-
-        $messaging->topic($topicName)->delete(true);
-        $messaging->queue($queueName)->delete(true);
     }
 }

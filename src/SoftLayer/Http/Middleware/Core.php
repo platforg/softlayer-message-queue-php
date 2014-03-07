@@ -16,6 +16,10 @@ class SoftLayer_Http_Middleware_Core implements SoftLayer_Http_Middleware_Interf
             $errors = "";
             $exception = "[{$status}]";
 
+            if(property_exists($body, 'message')) {
+                $exception .= " - {$body->message}";
+            }
+
             if(property_exists($body, 'errors')) {
                 foreach($body->errors as $category => $collection) {
                     $errors .= "{$category}: " . implode(", ", $collection);

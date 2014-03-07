@@ -15,7 +15,10 @@ class SoftLayer_Http_Adapter_Curl implements SoftLayer_Http_Adapter_Interface
         $url  = "";
         $url .= $request->getBaseUrl();
         $url .= $request->getPath();
-        $url .= "?".http_build_query($request->getParams());
+
+        if($request->getParams()) {
+            $url .= "?".http_build_query($request->getParams());
+        }
 
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_TIMEOUT, 100);

@@ -1,31 +1,19 @@
 <?php
 
 require_once 'bootstrap.php';
-require_once 'mock.php';
 
-class QueueTest extends PHPUnit_Framework_TestCase
+class QueueTest extends BaseTest
 {
     public function testQueuesList()
     {
-        $messaging = new SoftLayer_Messaging();
+        $queueName = self::queueName();
 
-        if(USE_MOCK) {
-            $messaging->getClient()->setAdapter(new SoftLayer_Http_Adapter_Mock());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::authenticate());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::objectCreated());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::queues());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::objectDeleted());
-        }
+        self::$messaging->queue($queueName)->create();
 
-        $queueName = 'testQueueList01';
+        $queues = self::$messaging->queues();
 
-        $messaging->authenticate(QUEUE_ACCOUNT, QUEUE_USERNAME, QUEUE_API_KEY);
-        $messaging->queue($queueName)->create();
-
-        $queues = $messaging->queues();
-
-        $request = $messaging->getClient()->getRequest();
-        $response = $messaging->getClient()->getResponse();
+        $request = self::$messaging->getClient()->getRequest();
+        $response = self::$messaging->getClient()->getResponse();
 
         $this->assertEquals('GET', $request->getMethod());
         $this->assertEquals('/queues', $request->getPath());
@@ -38,52 +26,24 @@ class QueueTest extends PHPUnit_Framework_TestCase
         // basic structure.
         $this->assertGreaterThanOrEqual(0, $response->getBody()->item_count);
         $this->assertCount($response->getBody()->item_count, $response->getBody()->items);
-
-        $messaging->queue($queueName)->delete();
-    }
-
-    public function testQueueSerialization()
-    {
-        $queue = new SoftLayer_Messaging_Queue();
-        $queue->setName("queue");
-        $queue->addTag("tag1");
-        $queue->addTag("tag2");
-        $queue->setVisibilityInterval(123456789);
-        $queue->setExpiration(987654321);
-
-        // Supressed by honoring static::$emit
-        $queue->doNotEmit = 123;
-
-        $this->assertEquals(json_decode(Mock::serializedQueue()), $queue->serialize());
     }
 
     public function testQueueCreationAndFetching()
     {
-        $messaging = new SoftLayer_Messaging();
+        $queueName = self::queueName();
 
-        $queueName = 'testQueueDetail01';
-
-        if(USE_MOCK) {
-            $messaging->getClient()->setAdapter(new SoftLayer_Http_Adapter_Mock());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::authenticate());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::objectCreated());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::queueDetail());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::objectDeleted());
-        }
-
-        $messaging->authenticate(QUEUE_ACCOUNT, QUEUE_USERNAME, QUEUE_API_KEY);
-        $messaging->queue($queueName)
+        self::$messaging->queue($queueName)
             ->setVisibilityInterval(30)
             ->setExpiration(604800)
             ->addTag('tag1')
             ->addTag('tag2')
             ->create();
 
-        $this->assertEquals(201, $messaging->getClient()->getResponse()->getStatus());
-        $this->assertEquals($queueName, $messaging->queue($queueName)->fetch()->getName());
+        $this->assertEquals(201, self::$messaging->getClient()->getResponse()->getStatus());
+        $this->assertEquals($queueName, self::$messaging->queue($queueName)->fetch()->getName());
 
-        $request = $messaging->getClient()->getRequest();
-        $response = $messaging->getClient()->getResponse();
+        $request = self::$messaging->getClient()->getRequest();
+        $response = self::$messaging->getClient()->getResponse();
 
         $body = $response->getBody();
 
@@ -91,41 +51,29 @@ class QueueTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(30, $body->visibility_interval);
         $this->assertEquals(604800, $body->expiration);
         $this->assertEquals(array('tag1', 'tag2'), $body->tags);
-
-        $messaging->queue($queueName)->delete();
     }
 
     public function testQueueCreationAndDeletion()
     {
-        $messaging = new SoftLayer_Messaging();
-
-        $queueName = 'testQueueDeletion01';
-
-        if(USE_MOCK) {
-            $messaging->getClient()->setAdapter(new SoftLayer_Http_Adapter_Mock());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::authenticate());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::objectCreated());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::objectDeleted());
-        }
-
-        $messaging->authenticate(QUEUE_ACCOUNT, QUEUE_USERNAME, QUEUE_API_KEY);
+        $queueName = self::queueName();
 
         // Test creation
-        $messaging->queue()
+        self::$messaging->queue()
             ->setName($queueName)
             ->create();
 
-        $request = $messaging->getClient()->getRequest();
-        $response = $messaging->getClient()->getResponse();
+        $request = self::$messaging->getClient()->getRequest();
+        $response = self::$messaging->getClient()->getResponse();
 
         $this->assertEquals('PUT', $request->getMethod());
         $this->assertEquals('Object created', $response->getBody()->message);
 
-        // ...and deletion
-        $messaging->queue($queueName)->delete();
+        // ...and deletion. This will cause us not to be able to clean it up
+        // automatically.
+        self::$messaging->queue($queueName)->delete();
 
-        $request = $messaging->getClient()->getRequest();
-        $response = $messaging->getClient()->getResponse();
+        $request = self::$messaging->getClient()->getRequest();
+        $response = self::$messaging->getClient()->getResponse();
 
         $this->assertEquals('DELETE', $request->getMethod());
         $this->assertEquals('Object queued for deletion', $response->getBody()->message);
@@ -133,25 +81,17 @@ class QueueTest extends PHPUnit_Framework_TestCase
 
     public function testQueueUpdate()
     {
-        // Only a functional test for now.
-        if(USE_MOCK) {
-            return;
-        }
+        $queueName = self::queueName();
 
-        $messaging = new SoftLayer_Messaging();
-        $messaging->authenticate(QUEUE_ACCOUNT, QUEUE_USERNAME, QUEUE_API_KEY);
-
-        $queueName = 'testQueueUpdate01';
-
-        $messaging->queue()
+        self::$messaging->queue()
             ->setName($queueName)
             ->setVisibilityInterval(100)
             ->create();
 
         // May be just updating it if the queue already exists.
-        $this->assertContains($messaging->getClient()->getResponse()->getStatus(), array(200, 201));
+        $this->assertContains(self::$messaging->getClient()->getResponse()->getStatus(), array(200, 201));
 
-        $queue = $messaging->queue($queueName)->fetch();
+        $queue = self::$messaging->queue($queueName)->fetch();
 
         // Are we getting back what we gave it?
         $this->assertEquals($queueName, $queue->getName());

@@ -1,12 +1,12 @@
 SoftLayer Message Queue - PHP Client
 ========================================
-This code provides PHP 5.2+ bindings written in PHP to communicate with the
+This code provides PHP 5.3+ bindings written in PHP to communicate with the
 [SoftLayer Message Queue API](http://sldn.softlayer.com/reference/messagequeueapi).
 
 
 Requirements
 ------------
-* PHP 5.2 or later
+* PHP 5.3 or later
 * cURL support
 * PHPUnit 3.6 or later (to run the test suite)
 * An active SoftLayer customer account with message queue service

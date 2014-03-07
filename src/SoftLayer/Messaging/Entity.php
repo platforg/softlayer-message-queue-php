@@ -47,16 +47,31 @@ abstract class SoftLayer_Messaging_Entity
 
     public function serialize()
     {
-        return (object)array_intersect_key(get_object_vars($this), array_flip(static::$emit));
+        $payload = new stdClass();
+
+        foreach(static::$emit as $property) {
+            // PHP can't distinguish between an empty array and an
+            // empty map for JSON serialization. In every case, "fields"
+            // needs to be a map - in this case represented by an empty
+            // stdClass instance.
+            if($property == 'fields' && empty($this->fields)) {
+                $this->fields = new stdClass;
+            }
+
+            $payload->$property = $this->$property;
+        }
+
+        return (object)$payload;
     }
 
     public function unserialize($object)
     {
-        foreach(static::$emit as $field) {
-            if(property_exists($object, $field)) {
-                $this->$field = $object->$field;
+        foreach(static::$emit as $property) {
+            if(property_exists($object, $property)) {
+                $this->$property = $object->$property;
             }
         }
+
         return $this;
     }
 }

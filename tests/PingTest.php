@@ -1,23 +1,15 @@
 <?php
 
 require_once 'bootstrap.php';
-require_once 'mock.php';
 
-class PingTest extends PHPUnit_Framework_TestCase
+class PingTest extends BaseTest
 {
     public function testPing()
     {
-        $messaging = new SoftLayer_Messaging();
+        self::$messaging->ping();
 
-        if(USE_MOCK) {
-            $messaging->getClient()->setAdapter(new SoftLayer_Http_Adapter_Mock());
-            $messaging->getClient()->getAdapter()->addMockResponse(Mock::ping());
-        }
-
-        $messaging->ping();
-
-        $request = $messaging->getClient()->getRequest();
-        $response = $messaging->getClient()->getResponse();
+        $request = self::$messaging->getClient()->getRequest();
+        $response = self::$messaging->getClient()->getResponse();
 
         $this->assertEquals('GET', $request->getMethod());
         $this->assertEquals('/ping', $request->getPath());
