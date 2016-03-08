@@ -1,18 +1,14 @@
 <?php
-
 include 'bootstrap.php';
 
-
-$messaging = new SoftLayer_Messaging();
+$messaging = new SoftLayer\Messaging();
 $messaging->authenticate(QUEUE_ACCOUNT, QUEUE_USERNAME, QUEUE_API_KEY);
 
 // Much like creating a queue, all I need to provide for a topic is a name.
 $topic = $messaging->topic('myFirstTopic')->create();
 
-
 // To actually do something, topics need subscribers. I can add either
 // HTTP and/or queue subscriptions.
-
 
 // A queue must exist before creating a subscription which targets it.
 $queue1 = $messaging->queue('myTargetQueue1')->create();
@@ -20,12 +16,11 @@ $queue2 = $messaging->queue('myTargetQueue2')->create();
 
 
 // First I'll create an endpoint targeting each queue.
-$queueEndpoint1 = SoftLayer_Messaging_Endpoint::endpointByType('queue');
+$queueEndpoint1 = SoftLayer\Messaging\Endpoint::endpointByType('queue');
 $queueEndpoint1->setQueueName($queue1->getName());
 
-$queueEndpoint2 = SoftLayer_Messaging_Endpoint::endpointByType('queue');
+$queueEndpoint2 = SoftLayer\Messaging\Endpoint::endpointByType('queue');
 $queueEndpoint2->setQueueName($queue2->getName());
-
 
 // Then I add them to the topic as individual subscriptions.
 $topic->subscription()

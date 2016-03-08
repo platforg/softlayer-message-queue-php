@@ -1,8 +1,5 @@
 <?php
-
-set_include_path(get_include_path().PATH_SEPARATOR.dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'src');
-
-require_once 'SoftLayer/Messaging.php';
+require_once('../vendor/autoload.php');
 
 define('QUEUE_ACCOUNT', getenv('QUEUE_ACCOUNT'));
 define('QUEUE_USERNAME', getenv('QUEUE_USERNAME'));
@@ -11,13 +8,14 @@ define('WAIT', 5);
 
 abstract class BaseTest extends PHPUnit_Framework_TestCase
 {
+    /** @var SoftLayer\Messaging() */
     public static $messaging;
     public static $queues = array();
     public static $topics = array();
 
     public static function setUpBeforeClass()
     {
-        self::$messaging = new SoftLayer_Messaging();
+        self::$messaging = new SoftLayer\Messaging();
         self::$messaging->authenticate(QUEUE_ACCOUNT, QUEUE_USERNAME, QUEUE_API_KEY);
         self::$queues = array();
         self::$topics = array();

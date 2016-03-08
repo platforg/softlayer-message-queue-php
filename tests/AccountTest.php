@@ -1,5 +1,4 @@
 <?php
-
 require_once 'bootstrap.php';
 
 class AuthTest extends BaseTest

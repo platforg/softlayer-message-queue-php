@@ -1,5 +1,4 @@
 <?php
-
 require_once 'bootstrap.php';
 
 class TopicTest extends BaseTest
@@ -22,7 +21,7 @@ class TopicTest extends BaseTest
         $this->assertNotEmpty($request->getHeader('X-Auth-Token'));
 
         $this->assertEquals(true, is_array($topics));
-        $this->assertEquals('SoftLayer_Messaging_Topic', get_class(array_shift($topics)));
+        $this->assertEquals('SoftLayer\Messaging\Topic', get_class(array_shift($topics)));
 
         // It's fine if this is empty, but the document should always have
         // basic structure.
@@ -40,7 +39,7 @@ class TopicTest extends BaseTest
         sleep(WAIT);
 
         // Create an HTTP endpoint
-        $http_endpoint = new SoftLayer_Messaging_Endpoint_Http();
+        $http_endpoint = new SoftLayer\Messaging\Endpoint\Http();
         $http_endpoint->setMethod("POST");
         $http_endpoint->setUrl("http://www.example.com/");
         $http_endpoint->setParams(array('param1' => 'value1'));
@@ -64,7 +63,7 @@ class TopicTest extends BaseTest
         sleep(WAIT);
 
         // Create a Queue endpoint
-        $queue_endpoint = new SoftLayer_Messaging_Endpoint_Queue();
+        $queue_endpoint = new SoftLayer\Messaging\Endpoint\Queue();
         $queue_endpoint->setQueueName($queueName);
 
         self::$messaging->topic($topicName)->subscription()
