@@ -1,5 +1,5 @@
 <?php
-require_once('../vendor/autoload.php');
+require dirname(__FILE__).'/../vendor/autoload.php';
 
 define('QUEUE_ACCOUNT',  getenv('QUEUE_ACCOUNT'));  // Your queue account id.
 define('QUEUE_USERNAME', getenv('QUEUE_USERNAME')); // Your portal username.

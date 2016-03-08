@@ -1,7 +1,7 @@
 {
     "name": "platforg/softlayer-message-queue-php",
     "description": "Provides a PHP Client for SoftLayer Message Queue",
-    "keywords": ["SoftLayer", "Message Queue"],
+    "keywords": ["SoftLayer", "Message", "Queue"],
     "homepage": "https://github.com/platforg/softlayer-message-queue-php",
     "type": "library",
     "license": "MIT",
