@@ -1,10 +1,15 @@
 <?php
+namespace SoftLayer\Messaging;
 
-class SoftLayer_Messaging_Topic extends SoftLayer_Messaging_Entity
+use SoftLayer\Messaging;
+
+class Topic extends Entity
 {
     protected static $emit = array('name', 'tags');
 
     protected $name;
+    protected $topic;
+    protected $uri = '/topics';
     protected $tags = array();
 
     public function __construct($name = '')
@@ -15,6 +20,8 @@ class SoftLayer_Messaging_Topic extends SoftLayer_Messaging_Entity
     public function setName($name)
     {
         $this->name = $name;
+        $this->topic = $this->uri . '/' . $name;
+
         return $this;
     }
 
@@ -26,12 +33,14 @@ class SoftLayer_Messaging_Topic extends SoftLayer_Messaging_Entity
     public function setTags($tags)
     {
         $this->tags = $tags;
+
         return $this;
     }
 
     public function addTag($tag)
     {
         $this->tags[] = $tag;
+
         return $this;
     }
 
@@ -39,7 +48,7 @@ class SoftLayer_Messaging_Topic extends SoftLayer_Messaging_Entity
     {
         $index = array_search($tag, $this->tags);
 
-        if($index !== false) {
+        if ($index !== false) {
             array_splice($this->tags, $index, 1);
         }
 
@@ -53,7 +62,7 @@ class SoftLayer_Messaging_Topic extends SoftLayer_Messaging_Entity
 
     public function fetch()
     {
-        return $this->unserialize($this->getClient()->get("/topics/".$this->getName())->getBody());
+        return $this->unserialize($this->getClient()->get($this->topic)->getBody());
     }
 
     public function create()
@@ -68,43 +77,58 @@ class SoftLayer_Messaging_Topic extends SoftLayer_Messaging_Entity
 
     public function save()
     {
-        $this->getClient()->put("/topics/".$this->getName(), array('body' => $this->serialize()));
+        $this->getClient()->put($this->topic, array('body' => $this->serialize()));
+
         return $this;
     }
 
     public function delete($force = false)
     {
-        $this->getClient()->delete("/topics/".$this->getName(), array('params' => array('force' => $force)));
+        $this->getClient()->delete($this->topic, array('params' => array('force' => $force)));
+
         return $this;
     }
 
+    /**
+     * @param string $body
+     *
+     * @return Message
+     */
     public function message($body = '')
     {
-        $message = new SoftLayer_Messaging_Message();
+        $message = new Message();
         $message->setParent($this);
         $message->setBody($body);
+
         return $message;
     }
 
-    public function subscription($endpoint_type = '')
+    /**
+     * @param string $endpointType
+     *
+     * @return Subscription
+     */
+    public function subscription($endpointType = '')
     {
-        $subscription = new SoftLayer_Messaging_Subscription();
+        $subscription = new Subscription();
         $subscription->setParent($this);
-        $subscription->setEndpointType($endpoint_type);
+        $subscription->setEndpointType($endpointType);
+
         return $subscription;
     }
 
+    /** @return Subscription[] */
     public function subscriptions()
     {
         $subscriptions = array();
-        $response = $this->getClient()->get("/topics/".$this->getName()."/subscriptions");
+        $response = $this->getClient()->get(sprintf('%s/subscriptions', $this->topic));
 
-        foreach($response->getBody()->items as $item) {
-            $subscription = new SoftLayer_Messaging_Subscription();
+        foreach ($response->getBody()->items as $item) {
+            $subscription = new Subscription();
             $subscription->setParent($this);
             $subscription->unserialize($item);
 
-            $endpoint = SoftLayer_Messaging_Endpoint::endpointByType($subscription->getEndpointType());
+            $endpoint = Endpoint::endpointByType($subscription->getEndpointType());
             $endpoint->setParent($subscription);
             $endpoint->unserialize($subscription->getEndpoint());
 

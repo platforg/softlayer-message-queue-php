@@ -1,7 +1,10 @@
 <?php
+namespace SoftLayer\Http\Middleware;
 
-interface SoftLayer_Http_Middleware_Interface
+use SoftLayer\Http;
+
+interface MiddlewareInterface
 {
-    public function filterRequest(SoftLayer_Http_Request &$request);
-    public function filterResponse(SoftLayer_Http_Response &$response);
+    public function filterRequest(Http\Request &$request);
+    public function filterResponse(Http\Response &$response);
 }

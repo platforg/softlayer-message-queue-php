@@ -1,14 +1,17 @@
 <?php
+namespace SoftLayer\Http\Middleware;
 
-class SoftLayer_Http_Middleware_Json implements SoftLayer_Http_Middleware_Interface
+use SoftLayer\Http;
+
+class Json implements MiddlewareInterface
 {
-    public function filterRequest(SoftLayer_Http_Request &$request)
+    public function filterRequest(Http\Request &$request)
     {
         $request->setHeader('Content-Type', 'application/json;charset=utf-8');
         $request->setBody(json_encode($request->getBody()));
     }
 
-    public function filterResponse(SoftLayer_Http_Response &$response)
+    public function filterResponse(Http\Response &$response)
     {
         if(stristr($response->getHeader('Content-Type'), 'application/json') !== false) {
             $response->setBody(json_decode($response->getBody()));

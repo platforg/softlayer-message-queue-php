@@ -1,6 +1,9 @@
 <?php
+namespace SoftLayer\Http\Adapter;
 
-interface SoftLayer_Http_Adapter_Interface
+use SoftLayer\Http;
+
+interface AdapterInterface
 {
-    public function call(SoftLayer_Http_Request &$request, SoftLayer_Http_Response &$response);
+    public function call(Http\Request &$request, Http\Response &$response);
 }

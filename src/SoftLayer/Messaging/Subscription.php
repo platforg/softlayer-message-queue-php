@@ -1,11 +1,12 @@
 <?php
+namespace SoftLayer\Messaging;
 
-class SoftLayer_Messaging_Subscription extends SoftLayer_Messaging_Entity
+class Subscription extends Entity
 {
     protected static $emit = array('id', 'endpoint_type', 'endpoint');
 
     protected $id;
-    protected $endpoint_type = '';
+    protected $endpointType = '';
     protected $endpoint = null;
 
     public function getId()
@@ -13,20 +14,22 @@ class SoftLayer_Messaging_Subscription extends SoftLayer_Messaging_Entity
         return $this->id;
     }
 
-    public function setEndpointType($endpoint_type)
+    public function setEndpointType($endpointType)
     {
-        $this->endpoint_type = $endpoint_type;
+        $this->endpointType = $endpointType;
+
         return $this;
     }
 
     public function getEndpointType()
     {
-        return $this->endpoint_type;
+        return $this->endpointType;
     }
 
     public function setEndpoint($endpoint)
     {
         $this->endpoint = $endpoint;
+
         return $this;
     }
 
@@ -37,13 +40,25 @@ class SoftLayer_Messaging_Subscription extends SoftLayer_Messaging_Entity
 
     public function create()
     {
-        $this->getClient()->post("/topics/".$this->getParent()->getName()."/subscriptions", array('body' => $this->serialize()));
+        $this->getClient()->post(
+            sprintf('/topics/%s/subscriptions', $this->getParent()->getName()),
+            array('body' => $this->serialize())
+        );
+
         return $this;
     }
 
     public function delete($id = null)
     {
-        $this->getClient()->delete("/".$this->getParent()->getShortType()."s/".$this->getParent()->getName()."/subscriptions/".($id?$id:$this->getId()));
+        $this->getClient()->delete(
+            sprintf(
+                '/%ss/%s/subscriptions/%s',
+                $this->getParent()->getShortType(),
+                $this->getParent()->getName(),
+                $id ? $id : $this->getId()
+            )
+        );
+
         return $this;
     }
 }

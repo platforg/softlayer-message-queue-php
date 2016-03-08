@@ -1,24 +1,31 @@
 <?php
+namespace SoftLayer\Http;
 
-class SoftLayer_Http_Client
+use SoftLayer\Http\Adapter\AdapterInterface;
+use SoftLayer\Http\Middleware\MiddlewareInterface;
+
+class Client
 {
-    private $baseUrl = '';
-    private $middleware = array();
-    private $defaultHeaders = array();
-    private $adapter;
-    private $request;
-    private $response;
+    /** @var string */
+    protected $baseUrl = '';
+    /** @var MiddlewareInterface[] */
+    protected $middleware = array();
+    /** @var array */
+    protected $defaultHeaders = array();
+    /** @var AdapterInterface */
+    protected $adapter;
+    /** @var Request */
+    protected $request;
+    /** @var Response */
+    protected $response;
 
+    /** @return Client */
     public static function getClient()
     {
-        $client = new SoftLayer_Http_Client();
-
-        // Default adapter
-        $client->setAdapter(new SoftLayer_Http_Adapter_Curl());
-
-        // Middleware
-        $client->addMiddleware(new SoftLayer_Http_Middleware_Core());
-        $client->addMiddleware(new SoftLayer_Http_Middleware_Json());
+        $client = new Client();
+        $client->setAdapter(new Adapter\Curl());
+        $client->addMiddleware(new Middleware\Core());
+        $client->addMiddleware(new Middleware\Json());
 
         return $client;
     }
@@ -31,32 +38,37 @@ class SoftLayer_Http_Client
     public function get($path, $options = array())
     {
         $this->call('GET', $path, $options);
+
         return $this->getResponse();
     }
 
     public function put($path, $options = array())
     {
         $this->call('PUT', $path, $options);
+
         return $this->getResponse();
     }
 
     public function post($path, $options = array())
     {
         $this->call('POST', $path, $options);
+
         return $this->getResponse();
     }
 
     public function delete($path, $options = array())
     {
         $this->call('DELETE', $path, $options);
+
         return $this->getResponse();
     }
 
-    public function setAdapter($adapter)
+    public function setAdapter(AdapterInterface $adapter)
     {
         $this->adapter = $adapter;
     }
 
+    /** @return AdapterInterface */
     public function getAdapter()
     {
         return $this->adapter;
@@ -72,12 +84,32 @@ class SoftLayer_Http_Client
         $this->defaultHeaders[$header] = $value;
     }
 
-    private function call($method, $path, $options = array())
+    /** @return Request */
+    public function getRequest()
+    {
+        if (! $this->request) {
+            $this->request = new Request();
+        }
+
+        return $this->request;
+    }
+
+    /** @return Response */
+    public function getResponse()
+    {
+        if (! $this->response) {
+            $this->response = new Response();
+        }
+
+        return $this->response;
+    }
+
+    protected function call($method, $path, $options = array())
     {
         $defaults = array(
             'headers' => array(),
             'params' => array(),
-            'body' => ""
+            'body' => '',
         );
 
         $options = array_merge($defaults, $options);
@@ -95,46 +127,32 @@ class SoftLayer_Http_Client
         $request->setHeaders($options['headers']);
         $request->setBody($options['body']);
 
-        foreach($this->defaultHeaders as $header => $value) {
+        foreach ($this->defaultHeaders as $header => $value) {
             $request->setHeader($header, $value);
         }
 
-        foreach($this->middleware as $middleware) {
+        foreach ($this->middleware as $middleware) {
             $middleware->filterRequest($request);
         }
 
         $this->adapter->call($request, $response);
 
-        foreach(array_reverse($this->middleware) as $middleware) {
-            $middleware->filterResponse($response);   
+        foreach (array_reverse($this->middleware) as $middleware) {
+            $middleware->filterResponse($response);
         }
 
         $this->setRequest($request);
         $this->setResponse($response);
     }
 
-    public function getRequest()
-    {
-        if(!$this->request) {
-            $this->request = new SoftLayer_Http_Request();
-        }
-        return $this->request;
-    }
-
-    public function getResponse()
-    {
-        if(!$this->response) {
-            $this->response = new SoftLayer_Http_Response();
-        }
-        return $this->response;
-    }
-
-    private function setRequest($request)
+    /** @param Request $request */
+    protected function setRequest(Request $request)
     {
         $this->request = $request;
     }
 
-    private function setResponse($response)
+    /** @param Response $response */
+    protected function setResponse(Response $response)
     {
         $this->response = $response;
     }

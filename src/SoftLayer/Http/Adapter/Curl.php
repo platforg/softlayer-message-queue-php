@@ -1,23 +1,26 @@
 <?php
+namespace SoftLayer\Http\Adapter;
 
-class SoftLayer_Http_Adapter_Curl implements SoftLayer_Http_Adapter_Interface
+use SoftLayer\Http;
+
+class Curl implements AdapterInterface
 {
-    public function call(SoftLayer_Http_Request &$request, SoftLayer_Http_Response &$response)
+    public function call(Http\Request &$request, Http\Response &$response)
     {
         $curl = curl_init();
 
         $headers = array();
 
-        foreach($request->getHeaders() as $header => $value) {
+        foreach ($request->getHeaders() as $header => $value) {
             $headers[] = "{$header}: {$value}";
         }
 
-        $url  = "";
+        $url = '';
         $url .= $request->getBaseUrl();
         $url .= $request->getPath();
 
-        if($request->getParams()) {
-            $url .= "?".http_build_query($request->getParams());
+        if ($request->getParams()) {
+            $url .= '?' . http_build_query($request->getParams());
         }
 
         curl_setopt($curl, CURLOPT_URL, $url);
@@ -29,8 +32,8 @@ class SoftLayer_Http_Adapter_Curl implements SoftLayer_Http_Adapter_Interface
 
         $body = curl_exec($curl);
 
-        if($body === false) {
-            throw new Exception(curl_error($curl));
+        if ($body === false) {
+            throw new \Exception(curl_error($curl));
         }
 
         $info = curl_getinfo($curl);

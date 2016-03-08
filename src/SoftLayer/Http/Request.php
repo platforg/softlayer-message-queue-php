@@ -1,6 +1,7 @@
 <?php
+namespace SoftLayer\Http;
 
-class SoftLayer_Http_Request extends SoftLayer_Http_Base
+class Request extends Base
 {
     private $params = array();
 

@@ -1,6 +1,9 @@
 <?php
+namespace SoftLayer\Messaging\Endpoint;
 
-class SoftLayer_Messaging_Endpoint_Queue extends SoftLayer_Messaging_Entity
+use SoftLayer\Messaging\Entity;
+
+class Queue extends Entity
 {
     protected static $emit = array('queue_name');
     protected static $type = 'queue';

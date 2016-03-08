@@ -1,12 +1,15 @@
 <?php
+namespace SoftLayer\Messaging;
 
-class SoftLayer_Messaging_Endpoint
+class Endpoint
 {
     public static function endpointByType($type)
     {
         switch(strtolower($type)) {
-            case 'http': return new SoftLayer_Messaging_Endpoint_Http(); break;
-            case 'queue': return new SoftLayer_Messaging_Endpoint_Queue(); break;
+            case 'http': return new Endpoint\Http(); break;
+            case 'queue': return new Endpoint\Queue(); break;
         }
+
+        throw new \Exception(sprintf('"%s" is not a valid endpoint type!'));
     }
 }

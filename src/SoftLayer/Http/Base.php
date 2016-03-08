@@ -1,11 +1,13 @@
 <?php
+namespace SoftLayer\Http;
 
-abstract class SoftLayer_Http_Base
+abstract class Base
 {
-    private $method;
-    private $path;
-    private $body;
-    private $headers = array();
+    protected $baseUrl;
+    protected $method;
+    protected $path;
+    protected $body;
+    protected $headers = array();
 
     public function setBaseUrl($baseUrl)
     {
@@ -54,8 +56,8 @@ abstract class SoftLayer_Http_Base
 
     public function getHeader($header)
     {
-        if(!array_key_exists($header, $this->headers)) {
-            return "";
+        if (! array_key_exists($header, $this->headers)) {
+            return '';
         }
 
         return $this->headers[$header];

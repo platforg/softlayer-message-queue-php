@@ -1,6 +1,9 @@
 <?php
+namespace SoftLayer\Messaging\Endpoint;
 
-class SoftLayer_Messaging_Endpoint_Http extends SoftLayer_Messaging_Entity
+use SoftLayer\Messaging\Entity;
+
+class Http extends Entity
 {
     protected static $emit = array('method', 'url', 'params', 'headers', 'body');
     protected static $type = 'http';
