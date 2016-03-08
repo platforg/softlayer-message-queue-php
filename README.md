@@ -1,8 +1,24 @@
 SoftLayer Message Queue - PHP Client
 ========================================
 This code provides PHP 5.3+ bindings written in PHP to communicate with the
-[SoftLayer Message Queue API](http://sldn.softlayer.com/reference/messagequeueapi).
+[SoftLayer Message Queue API](http://sldn.softlayer.com/reference/messagequeueapi).  
 
+Installing via Composer
+-----------------------
+
+Add `platforg/softlayer-message-queue-php` as a dependency
+
+	"require": {
+		"platforg/softlayer-message-queue-php": "~0.1"
+	}
+
+Then update the dependencies:
+
+    composer update
+
+Include Composer's autoload to your porject:
+
+    require_once('vendor/autoload.php');
 
 Requirements
 ------------
@@ -15,7 +31,7 @@ Need more help?
 ---------------
 
 For additional guidance and information, check out the
-[Message Queue API reference](http://sldn.softlayer.com/reference/messagequeueapi) 
+[Message Queue API reference](http://sldn.softlayer.com/reference/messagequeueapi)
 or the [SoftLayer Developer Network forum](https://forums.softlayer.com/forumdisplay.php?f=27).
 
 For specific issues with the PHP client library, get in touch with us via the
