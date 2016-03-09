@@ -13,7 +13,7 @@ class Json implements MiddlewareInterface
 
     public function filterResponse(Http\Response &$response)
     {
-        if(stristr($response->getHeader('Content-Type'), 'application/json') !== false) {
+        if (stristr($response->getHeader('Content-Type'), 'application/json') !== false) {
             $response->setBody(json_decode($response->getBody()));
         }
     }

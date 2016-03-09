@@ -17,6 +17,7 @@ class Http extends Entity
     public function setMethod($method)
     {
         $this->method = $method;
+
         return $this;
     }
 
@@ -28,6 +29,7 @@ class Http extends Entity
     public function setUrl($url)
     {
         $this->url = $url;
+
         return $this;
     }
 
@@ -39,6 +41,7 @@ class Http extends Entity
     public function setParams($params)
     {
         $this->params = $params;
+
         return $this;
     }
 
@@ -50,6 +53,7 @@ class Http extends Entity
     public function setHeaders($headers)
     {
         $this->headers = $headers;
+
         return $this;
     }
 
@@ -61,6 +65,7 @@ class Http extends Entity
     public function setBody($body)
     {
         $this->body = $body;
+
         return $this;
     }
 

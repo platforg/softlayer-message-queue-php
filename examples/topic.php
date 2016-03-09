@@ -14,7 +14,6 @@ $topic = $messaging->topic('myFirstTopic')->create();
 $queue1 = $messaging->queue('myTargetQueue1')->create();
 $queue2 = $messaging->queue('myTargetQueue2')->create();
 
-
 // First I'll create an endpoint targeting each queue.
 $queueEndpoint1 = SoftLayer\Messaging\Endpoint::endpointByType('queue');
 $queueEndpoint1->setQueueName($queue1->getName());
@@ -33,32 +32,30 @@ $topic->subscription()
     ->setEndpoint($queueEndpoint2)
     ->create();
 
-
 // Now the topic should tell me I have 2 subscribers, each targeting a
 // different queue.
 $subscriptions = $topic->subscriptions();
 
-foreach($subscriptions as $s) {
+foreach ($subscriptions as $s) {
     echo $s->getId() . ' : ' . $s->getEndpointType() . ' : ' . $s->getEndpoint()->getQueueName() . PHP_EOL;
 }
-
 
 // Finally, I can push a message to the topic. That message will subsequently
 // end up in both target queues.
 $topic->message('Example Message 1')->create();
 
-
 // The message needs a moment to be dispatched and visible.
 sleep(10);
 
-
-if(count($queue1->messages()) > 0) echo "Queue 1 got the message!" . PHP_EOL;
-if(count($queue2->messages()) > 0) echo "Queue 2 got the message!" . PHP_EOL;
-
+if (count($queue1->messages()) > 0) {
+    echo "Queue 1 got the message!" . PHP_EOL;
+}
+if (count($queue2->messages()) > 0) {
+    echo "Queue 2 got the message!" . PHP_EOL;
+}
 
 // Finally, I can delete the topic and all its subscribers.
 $topic->delete(true);
-
 
 // Might as well remove the target queues as well!
 $queue1->delete(true);

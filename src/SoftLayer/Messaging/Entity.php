@@ -15,6 +15,9 @@ abstract class Entity
         return strtolower(get_called_class());
     }
 
+    /**
+     * @return Entity
+     */
     public function getShortType()
     {
         $type = $this->getType();
@@ -45,6 +48,9 @@ abstract class Entity
         $this->parent = $parent;
     }
 
+    /**
+     * @return Entity|Mixed
+     */
     public function getParent()
     {
         return $this->parent;

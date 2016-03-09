@@ -31,13 +31,13 @@ $queue->save();
 // them.
 $queues = $messaging->queues();
 
-foreach($queues as $q) {
+foreach ($queues as $q) {
     // Each of these $q objects are also fully functional,
     // so I can add another tag and save it here.
     $q->addTag('tag3');
     $q->update();
 
-    echo $q->getName() . '(' . implode(',', $q->getTags()) . ')'. PHP_EOL;
+    echo $q->getName() . '(' . implode(',', $q->getTags()) . ')' . PHP_EOL;
 }
 
 // Finally, I can remove them by name.

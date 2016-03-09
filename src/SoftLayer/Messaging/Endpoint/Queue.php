@@ -13,6 +13,7 @@ class Queue extends Entity
     public function setQueueName($queue_name)
     {
         $this->queue_name = $queue_name;
+
         return $this;
     }
 
