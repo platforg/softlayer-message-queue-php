@@ -8,17 +8,17 @@ class Queue extends Entity
     protected static $emit = array('queue_name');
     protected static $type = 'queue';
 
-    public $queue_name;
+    public $queueName;
 
-    public function setQueueName($queue_name)
+    public function setQueueName($queueName)
     {
-        $this->queue_name = $queue_name;
+        $this->queueName = $queueName;
 
         return $this;
     }
 
     public function getQueueName()
     {
-        return $this->queue_name;
+        return $this->queueName;
     }
 }
