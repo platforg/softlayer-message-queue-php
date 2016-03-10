@@ -9,7 +9,7 @@ Installing via Composer
 Add `platforg/softlayer-message-queue-php` as a dependency
 
 	"require": {
-		"platforg/softlayer-message-queue-php": "~0.1"
+		"platforg/softlayer-message-queue-php": "~0.2"
 	}
 
 Then update the dependencies:
