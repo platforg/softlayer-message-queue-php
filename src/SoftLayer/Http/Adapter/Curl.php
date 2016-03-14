@@ -32,6 +32,12 @@ class Curl implements AdapterInterface
 
         $body = curl_exec($curl);
 
+            /*var_dump($url);
+            var_dump($request);
+            var_dump($headers);
+            var_dump($body);
+            var_dump(curl_getinfo($curl));*/
+
         if ($body === false) {
             throw new \Exception(curl_error($curl));
         }

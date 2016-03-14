@@ -9,6 +9,7 @@ abstract class Entity
 
     protected $client;
     protected $parent;
+    protected $fields = array();
 
     public function getType()
     {
@@ -21,7 +22,7 @@ abstract class Entity
     public function getShortType()
     {
         $type = $this->getType();
-        $type = explode('_', $type);
+        $type = explode('\\', $type);
 
         return array_pop($type);
     }
@@ -61,15 +62,15 @@ abstract class Entity
         $payload = new \stdClass();
 
         foreach (static::$emit as $property) {
-            // PHP can't distinguish between an empty array and an
-            // empty map for JSON serialization. In every case, "fields"
-            // needs to be a map - in this case represented by an empty
-            // stdClass instance.
             if ($property == 'fields' && empty($this->fields)) {
                 $this->fields = new \stdClass;
             }
 
-            $payload->$property = $this->$property;
+            $payload->$property = $this->{$this->toCamelCase($property)};
+
+            if ($payload->$property instanceof Entity) {
+                $payload->$property = $payload->$property->serialize();
+            }
         }
 
         return (object) $payload;
@@ -79,10 +80,15 @@ abstract class Entity
     {
         foreach (static::$emit as $property) {
             if (property_exists($object, $property)) {
-                $this->$property = $object->$property;
+                $this->{$this->toCamelCase($property)} = $object->$property;
             }
         }
 
         return $this;
+    }
+
+    protected function toCamelCase($property)
+    {
+        return lcfirst(join('', array_map('ucfirst', explode('_', $property))));
     }
 }

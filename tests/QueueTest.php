@@ -19,7 +19,7 @@ class QueueTest extends BaseTest
         $this->assertNotEmpty($request->getHeader('X-Auth-Token'));
 
         $this->assertEquals(true, is_array($queues));
-        $this->assertEquals('SoftLayer_Messaging_Queue', get_class(array_shift($queues)));
+        $this->assertEquals('SoftLayer\Messaging\Queue', get_class(array_shift($queues)));
 
         // It's fine if this is empty, but the document should always have
         // basic structure.

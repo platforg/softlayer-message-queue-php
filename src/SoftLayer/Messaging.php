@@ -14,7 +14,7 @@ class Messaging
     /** @var Client */
     protected $client;
 
-    public function __construct($endpoint = 'dal05', $protected = false, $apiVersion = 'v1')
+    public function __construct($endpoint = 'dal05', $private = false, $apiVersion = 'v1')
     {
         if (! isset(Endpoints::$endpoints[$endpoint])) {
             throw new \Exception(sprintf('Endpoint "%s" Not Found!', $endpoint));
@@ -22,7 +22,7 @@ class Messaging
 
         $this->endpoint = sprintf(
             'https://%s/%s',
-            Endpoints::$endpoints[$endpoint][($protected ? 'protected' : 'public')],
+            Endpoints::$endpoints[$endpoint][($private ? 'private' : 'public')],
             $apiVersion
         );
     }

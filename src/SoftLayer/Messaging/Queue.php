@@ -12,11 +12,10 @@ class Queue extends Entity
         'visible_message_count',
     );
     protected $fetched = false;
-
-    protected $name;
     protected $queue;
     protected $uri = '/queues';
 
+    protected $name;
     protected $tags = array();
     protected $visibilityInterval = 10;
     protected $expiration = 604800;
